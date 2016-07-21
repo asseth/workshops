@@ -1,0 +1,158 @@
+<!doctype>
+<html>
+<head>
+    <script type="text/javascript" src="js/bignumber.min.js"></script>
+    <script type="text/javascript" src="js/web3.min.js"></script>
+    <script type="text/javascript">
+
+        var Web3 = require('web3');
+        var web3 = new Web3();
+
+        // XXX Conditionnaly set it so it runs in mist
+        web3.setProvider(new web3.providers.HttpProvider());
+
+        window.onload = function() {
+
+            // Populate a <select> with the available accounts
+            var selectAccount = document.getElementById("selectAccount");
+            for(var i=0; i< web3.eth.accounts.length; i++) {
+                var addr = web3.eth.accounts[i];
+                var el = document.createElement("option");
+                el.textContent = addr;
+                el.value = addr;
+                selectAccount.appendChild(el);
+            }
+        }
+
+        var ethlove = web3.eth.contract(
+            [{
+                constant: false,
+                inputs: [{
+                    name: "a_",
+                    type: "address"
+                }, {
+                    name: "b_",
+                    type: "address"
+                }],
+                name: "areLinked",
+                outputs: [{
+                    name: "",
+                    type: "bool"
+                }],
+                type: "function"
+            }, {
+                constant: true,
+                inputs: [{
+                    name: "",
+                    type: "address"
+                }],
+                name: "links",
+                outputs: [{
+                    name: "linkerName",
+                    type: "string"
+                }, {
+                    name: "linked",
+                    type: "address"
+                }],
+                type: "function"
+            }, {
+                constant: false,
+                inputs: [{
+                    name: "linkerName_",
+                    type: "string"
+                }, {
+                    name: "linked_",
+                    type: "address"
+                }],
+                name: "link",
+                outputs: [],
+                type: "function"
+            }, {
+                inputs: [],
+                type: "constructor"
+            }, {
+                anonymous: false,
+                inputs: [{
+                    indexed: false,
+                    name: "a_",
+                    type: "address"
+                }, {
+                    indexed: false,
+                    name: "b_",
+                    type: "address"
+                }],
+                name: "NewLoveLock",
+                type: "event"
+            }]).at("0x706d95760dbb345b49e913333009f7b24c14e857");
+
+        function displayLock(text) {
+            var node = document.createElement('li');
+            var textnode = document.createTextNode(text);
+            node.appendChild(textnode);
+            document.getElementById('lovelocks').appendChild(node);
+        }
+
+        function watchLocks() {
+            // clear the love lock list
+            document.getElementById('lovelocks').innerText = "";
+
+            var linkEventAll = ethlove.NewLoveLock(
+                {}, {fromBlock: 0, toBlock: 'latest'});
+
+            linkEventAll.watch(function(err, log) {
+
+                if (err != null) {
+                    console.log(err);
+                    return;
+                }
+                
+                var lock = log.args;
+                displayLock(
+                    ethlove.links(lock.a_)[0] + " loves " + 
+                    ethlove.links(lock.b_)[0] + " forever."
+                );             
+            });
+        }
+
+        function createLink() {
+            var creationForm = document.forms["createLockForm"];
+            var from = creationForm["selectAccount"].value;
+            console.log("From:", from);
+            var passphrase = creationForm["passphrase"].value;
+
+            // This unlocks the account for one minute.
+            // This is BAD
+            web3.personal.unlockAccount(from, passphrase, 60);
+            console.log("Account", from, "unlocked")
+
+            var linkerName = creationForm["linkerName"].value;         
+            var linked = creationForm["linked"].value;
+
+            ethlove.link.sendTransaction(
+                linkerName, linked, {from: from});
+        }
+
+    </script>
+</head>
+<body>
+    <h1>ETH LOVE</h1>
+
+    (The CSS is left as an exercise for the reader)
+
+    <h2>Create a love lock</h2>
+        <form name="createLockForm" action="#" onsubmit="createLink()">
+            Account to use: <select id="selectAccount"><select/><br/>
+            Passphrase: <input type="text" name="passphrase"><br/>
+            Your Name: <input type="text" name="linkerName"><br/>
+            Your loved one address: <input type="text" name="linked"><br/>
+            <br/>
+            <input type="submit" value="Submit"><br/>
+        </form>
+
+    <h2>List the love locks</h2>
+    <button type="button" onClick="watchLocks();">refresh</button>
+    <br/><br/><br/>
+    <div id="lovelocks"></div>
+</body>
+</html>
+

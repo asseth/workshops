@@ -1,15 +1,14 @@
 Compile and deploy a contract
 =============================
 
-Requires: python3, solc, geth
-
 Example with ethlove (it creates EthLove.js) :
 
-    python3.5 compile.py ethlove.sol
+    cd ~/workshop/ethlove
+    python3 compile.py ethlove.sol
 
 In geth console :
 
-    loadScript("<PATH>/EthLove.js")
+    loadScript("/home/vagrant/workshop/ethlove/EthLove.js")
     personal.unlockAccount(<YOUR ACCOUNT>)
     var ethlove = deployEthLove()
 
@@ -19,19 +18,33 @@ And then :
     "0x8ef..."
     > eth.sendTransaction({from: eth.coinbase, to: eth.accounts[2], value: web3.toWei(1, "ether")})
     "0x6b4..."
-    > ethlove.areLinked.call(eth.accounts[1], eth.accounts[2])
+    > ethlove.<METHOD>.call(eth.accounts[1], eth.accounts[2])
     false
-    > ethlove.link.sendTransaction(eth.accounts[1], {from: eth.accounts[2]})
+    > ethlove.<METHOD>.sendTransaction(eth.accounts[1], {from: eth.accounts[2]})
     "0xca2..."
-    > ethlove.areLinked.call(eth.accounts[1], eth.accounts[2])
+    > ethlove.<METHOD>.call(eth.accounts[1], eth.accounts[2])
     false
-    > ethlove.link.sendTransaction(eth.accounts[2], {from: eth.accounts[1]})
+    > ethlove.<METHOD>.sendTransaction(eth.accounts[2], {from: eth.accounts[1]})
     "0xd9b..."
-    > ethlove.areLinked.call(eth.accounts[1], eth.accounts[2])
+    > ethlove.<METHOD>.call(eth.accounts[1], eth.accounts[2])
     true
 
-Attach a console in dev mode
-============================
 
-    geth --dev --datadir /tmp/ethereum_dev_mode
-    geth attach ipc:/tmp/ethereum_dev_mode/geth.ipc
+Develop a web dapp locally
+==========================
+
+You need two services running, geth with some rpc options and a web server
+
+In term A:
+    cd workshop/ethlove
+    python3 -m http.server
+
+In term B:
+    geth --dev --rpc --rpccorsdomain "http://localhost:8000" --rpcapi "eth,personal" --datadir /tmp/ethereum_dev_mode
+
+Browse to http://localhost:8000/ethlove.html
+
+If you want to setup a few thing and/or have a JS geth console to test your 
+web dapp, you can preload some js :
+    
+    geth --preload preload.js attach ipc:/tmp/ethereum_dev_mode/geth.ipc
