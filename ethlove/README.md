@@ -36,10 +36,12 @@ Develop a web dapp locally
 You need two services running, geth with some rpc options and a web server
 
 In term A:
+
     cd workshop/ethlove
     python3 -m http.server
 
 In term B:
+
     geth --dev --rpc --rpccorsdomain "http://localhost:8000" --rpcapi "eth,personal" --datadir /tmp/ethereum_dev_mode
 
 Browse to http://localhost:8000/ethlove.html
