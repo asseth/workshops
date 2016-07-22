@@ -4,8 +4,34 @@ import subprocess
 import sys
 
 
+_TEMPLATE = """
+var {name}AbiBin = {abi_bin};
+
+var {name}Contract = web3.eth.contract(JSON.parse({name}AbiBin.abi));
+
+function deploy{name}() {{
+    console.log('deploying {name} contract...')
+    // Pass constructor arguments to new if necessary 
+    return {name}Contract.new(
+        {{from:eth.coinbase, data: {name}AbiBin.bin, gas: 1000000}},
+        function(error, contract){{
+            if (error) {{
+                console.error(error);
+                return;
+            }}
+            if(!contract.address) {{
+                console.log(
+                    "contract {name} creation transaction: " +
+                        contract.transactionHash);
+            }} else {{
+                console.log("contract {name} mined! Address: " + contract.address);
+            }}
+        }});
+}}
+"""
+
+
 def compile_solidity(src_path):
-    # Python 3.5 only
     output = subprocess.check_output(['solc', src_path, '--combined-json', 'abi,bin'])
     return json.loads(output.decode('utf-8'))['contracts']
 
@@ -20,8 +46,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     contracts = compile_solidity(args.src)
-    template = open('deploy_template.js').read()
 
     for name, abi_bin in contracts.items():
         with open(name+'.js', 'w') as f:
-            f.write(template.format(name=name, abi_bin=abi_bin))
+            f.write(_TEMPLATE.format(name=name, abi_bin=abi_bin))

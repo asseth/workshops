@@ -1,52 +1,68 @@
-Compile and deploy a contract
-=============================
+Welcome to the first Asseth workshop !
 
-Example with ethlove (it creates EthLove.js) :
+
+Here we provide the skeleton of a dapp that you can use as a starting point 
+for your project.
+
+A Dapp needs to be connected to an ethereum node. Let's start one by executing 
+the following command in a terminal  :
+
+    geth --dev --rpc --rpccorsdomain "http://localhost:8000" --rpcapi "eth,personal" --datadir /tmp/ethereum_dev_mode
+
+`geth` is a popular ethereum client written in Go. We gave him the `--dev`
+option : this tells geth to start in development mode. Instead of coding and testing
+our Dapp directly on the main ethereum blockchain (which would be slow and
+costly), we will start our own private blockchain starting at Block 0.
+
+Once you are satisfied with your code, the exact same `geth` can be used to
+deploy your smart contract on the "real" ethereum blockchain.
+
+
+To put the solidity smart-contract `ethlove.sol` on our pristine blockchain,
+we first need to compile it : 
 
     cd ~/workshop/ethlove
     python3 compile.py ethlove.sol
 
-In geth console :
-
-    loadScript("/home/vagrant/workshop/ethlove/EthLove.js")
-    personal.unlockAccount(<YOUR ACCOUNT>)
-    var ethlove = deployEthLove()
-
-And then :
-
-    > eth.sendTransaction({from: eth.coinbase, to: eth.accounts[1], value: web3.toWei(1, "ether")})
-    "0x8ef..."
-    > eth.sendTransaction({from: eth.coinbase, to: eth.accounts[2], value: web3.toWei(1, "ether")})
-    "0x6b4..."
-    > ethlove.<METHOD>.call(eth.accounts[1], eth.accounts[2])
-    false
-    > ethlove.<METHOD>.sendTransaction(eth.accounts[1], {from: eth.accounts[2]})
-    "0xca2..."
-    > ethlove.<METHOD>.call(eth.accounts[1], eth.accounts[2])
-    false
-    > ethlove.<METHOD>.sendTransaction(eth.accounts[2], {from: eth.accounts[1]})
-    "0xd9b..."
-    > ethlove.<METHOD>.call(eth.accounts[1], eth.accounts[2])
-    true
+`compile.py` is a small python script that use `solc`, the solidity compiler
+to compile the contract. Running it creates the file `EthLove.js`, which is
+just there to help deploying the contract with `geth`.
 
 
-Develop a web dapp locally
-==========================
+To be able to put the contract on the blockchain, we need to : 
 
-You need two services running, geth with some rpc options and a web server
+- Create an account and make sure there is some ether on it. Since we are on a
+private blockchain, we will need to mine it.
 
-In term A:
+- Unlock the account, create and send the contract creation transaction.
 
-    cd workshop/ethlove
+Doing so manually each time we are testing our contract would be tedious, we
+use preload.js to automatize this :
+
+    geth --preload preload.js attach ipc:/tmp/ethereum_dev_mode/geth.ipc
+
+Wait a few blocks and... congratulations ! You should now have a javascript
+console to interact with the blockchain and your contract (if you read
+`preload.js` as you should have you know there is an `ethlove` variable that
+reference your contract instance).
+
+
+The `geth` console is very powerful, but not very user friendly. You will
+probably want your Dapp to have a nice web front-end. Open a new terminal and
+start a http server :
+
+    cd ~/workshop/ethlove
     python3 -m http.server
 
-In term B:
 
-    geth --dev --rpc --rpccorsdomain "http://localhost:8000" --rpcapi "eth,personal" --datadir /tmp/ethereum_dev_mode
+Open a browser and type in the address `http://localhost:8000/ethlove.html`
 
-Browse to http://localhost:8000/ethlove.html
+The few words you see comes from the ethereum contract you deployed earlier.
+Not very impressive, I know. It is now up to you to make it better !
 
-If you want to setup a few thing and/or have a JS geth console to test your 
-web dapp, you can preload some js :
-    
-    geth --preload preload.js attach ipc:/tmp/ethereum_dev_mode/geth.ipc
+
+Ressources
+==========
+
+- Solidity documentation : https://solidity.readthedocs.io/en/latest/
+- Ethereum Javascript API : https://github.com/ethereum/wiki/wiki/JavaScript-API

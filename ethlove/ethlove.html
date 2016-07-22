@@ -24,23 +24,10 @@
             }
         }
 
+        // Instanciate the contract object. Needs to be updated when the
+        // contract is modified/redeployed.
         var ethlove = web3.eth.contract(
             [{
-                constant: false,
-                inputs: [{
-                    name: "a_",
-                    type: "address"
-                }, {
-                    name: "b_",
-                    type: "address"
-                }],
-                name: "areLinked",
-                outputs: [{
-                    name: "",
-                    type: "bool"
-                }],
-                type: "function"
-            }, {
                 constant: true,
                 inputs: [{
                     name: "",
@@ -53,6 +40,18 @@
                 }, {
                     name: "linked",
                     type: "address"
+                }],
+                type: "function"
+            }, {
+                constant: true,
+                inputs: [{
+                    name: "addr_",
+                    type: "address"
+                }],
+                name: "getName",
+                outputs: [{
+                    name: "",
+                    type: "string"
                 }],
                 type: "function"
             }, {
@@ -74,17 +73,19 @@
                 anonymous: false,
                 inputs: [{
                     indexed: false,
-                    name: "a_",
+                    name: "first",
                     type: "address"
                 }, {
                     indexed: false,
-                    name: "b_",
+                    name: "second",
                     type: "address"
                 }],
                 name: "NewLoveLock",
                 type: "event"
-            }]).at("0x706d95760dbb345b49e913333009f7b24c14e857");
+            }]
+        ).at("0xc6c6bc1a01a53760f2de3bce6da22a25d69dfd43");
 
+        // Add text to the Love lock list
         function displayLock(text) {
             var node = document.createElement('li');
             var textnode = document.createTextNode(text);
@@ -92,6 +93,8 @@
             document.getElementById('lovelocks').appendChild(node);
         }
 
+
+        // Look up all the locks created since the genesis block
         function watchLocks() {
             // clear the love lock list
             document.getElementById('lovelocks').innerText = "";
@@ -108,12 +111,13 @@
                 
                 var lock = log.args;
                 displayLock(
-                    ethlove.links(lock.a_)[0] + " loves " + 
-                    ethlove.links(lock.b_)[0] + " forever."
+                    ethlove.getName(lock.first) + " loves " + 
+                    ethlove.getName(lock.second)
                 );             
             });
         }
 
+        // Read the form and create a ethlove.link() transaction
         function createLink() {
             var creationForm = document.forms["createLockForm"];
             var from = creationForm["selectAccount"].value;
