@@ -21,7 +21,7 @@ deploy your smart contract on the "real" ethereum blockchain.
 To put the solidity smart-contract `ethlove.sol` on our pristine blockchain,
 we first need to compile it : 
 
-    cd ~/projects/workshop/ethlove
+    cd ~/workshop/ethlove
     python3 compile.py ethlove.sol
 
 `compile.py` is a small python script that use `solc`, the solidity compiler
@@ -51,7 +51,7 @@ The `geth` console is very powerful, but not very user friendly. You will
 probably want your Dapp to have a nice web front-end. Open a new terminal and
 start a http server :
 
-    cd ~/projects/workshop/ethlove
+    cd ~/workshop/ethlove
     python3 -m http.server
 
 
