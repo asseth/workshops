@@ -48,8 +48,12 @@ reference your contract instance).
 
 
 The `geth` console is very powerful, but not very user friendly. You will
-probably want your Dapp to have a nice web front-end. Open a new terminal and
-start a http server :
+probably want your Dapp to have a nice web front-end.  In the geth console
+type `ethlove.address` to know the contract address. You need to edit
+ethlove.html, find the `.at("<CONTRACT ADDRESS HERE>")` line and enter your
+contract address.
+
+Now open a new terminal and start a http server :
 
     cd ~/workshop/ethlove
     python3 -m http.server

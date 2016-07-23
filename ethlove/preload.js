@@ -2,7 +2,7 @@ console.log("Preloading...");
 
 // We want 3 accounts for our tests
 while (eth.accounts.length < 3) {
-	console.log("Creating test account");
+	console.log("Creating test account...");
 	personal.newAccount(""); // Empty passphrase
 }
 
