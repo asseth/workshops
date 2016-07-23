@@ -17,8 +17,6 @@ for (i = 0; i < eth.accounts.length; i++) {
 
 // Account aliases
 var alice = eth.accounts[0];
-var gerard = eth.accounts[1];
-var monique = eth.accounts[2];
 
 console.log("Provisioning accounts with some eth...");
 
@@ -29,7 +27,7 @@ while(web3.fromWei(eth.getBalance(alice), "ether") <= eth.accounts.length) {
 }
 
 // Alice sends 1 eth to every poor accounts
-for (i = 0; i < eth.accounts.length; i++) {
+for (i = 1; i < eth.accounts.length; i++) {
 	var acc = eth.accounts[i];
 	if (web3.fromWei(eth.getBalance(acc), "ether") < 0.1) {
 		eth.sendTransaction({from:alice, to:acc, value: web3.toWei(1, "ether")})
@@ -42,8 +40,6 @@ var ethlove = deployEthLove();
 admin.sleepBlocks(1);
 
 function runEthLove() {
-	console.log("Linking Gerard & Monique...")
-	ethlove.link.sendTransaction("Monique", gerard, {from: monique});
-	ethlove.link.sendTransaction("Gerard", monique, {from: gerard});
-	admin.sleepBlocks(3);
+	// You can put test code for your contract here
+	// (runEthLove needs to be called manually in geth console)
 }
