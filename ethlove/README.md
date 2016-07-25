@@ -1,10 +1,13 @@
+[An example dapp implementation is on the asseth-dapp branch](https://github.com/asseth/workshop/tree/asseth-dapp/ethlove)
+
+
 Welcome to the first Asseth workshop !
 
 
-Here we provide the skeleton of a dapp that you can use as a starting point 
+Here we provide the skeleton of a dapp that you can use as a starting point
 for your project.
 
-A Dapp needs to be connected to an ethereum node. Let's start one by executing 
+A Dapp needs to be connected to an ethereum node. Let's start one by executing
 the following command in a terminal  :
 
     geth --dev --rpc --rpccorsdomain "http://localhost:8000" --rpcapi "eth,personal" --datadir /tmp/ethereum_dev_mode
@@ -19,7 +22,7 @@ deploy your smart contract on the "real" ethereum blockchain.
 
 
 To put the solidity smart-contract `ethlove.sol` on our pristine blockchain,
-we first need to compile it : 
+we first need to compile it :
 
     cd ~/projects/workshop/ethlove
     python3 compile.py ethlove.sol
@@ -29,7 +32,7 @@ to compile the contract. Running it creates the file `EthLove.js`, which is
 just there to help deploying the contract with `geth`.
 
 
-To be able to put the contract on the blockchain, we need to : 
+To be able to put the contract on the blockchain, we need to :
 
 - Create an account and make sure there is some ether on it. Since we are on a
 private blockchain, we will need to mine it.
